@@ -1060,9 +1060,9 @@ set disc_ran [ RandomNumber 0 50 ]
 set c_discount [ expr {$disc_ran / 100.0} ]
 set c_data [ MakeAlphaString 300 500 $globArray $chalen ]
 set my_values { admin manager customer hokage jew machine }
-set res_up  [my_lpick my_values]
-set res_del [my_lpick my_values]
-set res_sel  [my_lpick my_values]
+set res_up  [my_lpick $my_values]
+set res_del [my_lpick $my_values]
+set res_sel  [my_lpick $my_values]
 append c_val_list ('$c_id', '$c_d_id', '$c_w_id', '$c_first', '$c_middle', '$c_last', '[ lindex $c_add 0 ]', '[ lindex $c_add 1 ]', '[ lindex $c_add 2 ]', '[ lindex $c_add 3 ]', '[ lindex $c_add 4 ]', '$c_phone', [ date_function ], '$c_credit', '$c_credit_lim', '$c_discount', '$c_balance', '$c_data', '10.0', '1', '0', '$res_up', '$res_del', '$res_sel')
 set h_data [ MakeAlphaString 12 24 $globArray $chalen ]
 append h_val_list ('$c_id', '$c_d_id', '$c_w_id', '$c_w_id', '$c_d_id', [ date_function ], '$h_amount', '$h_data')
