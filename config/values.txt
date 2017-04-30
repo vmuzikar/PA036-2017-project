@@ -1,0 +1,6 @@
+admin
+member
+customer
+manager
+chef
+receptionist

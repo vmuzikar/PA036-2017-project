@@ -1,8 +1,11 @@
 #!/usr/local/bin/tclsh8.6
+
+puts "[pwd]"
+
 if [catch {package require Pgtcl} ] { error "Failed to load Pgtcl - Postgres Library Error" }
 proc CreateStoredProcs { lda ora_compatible } {
-puts "CREATING TPCC STORED PROCEDURES"
-if { $ora_compatible eq "true" } {
+	puts "CREATING TPCC STORED PROCEDURES"
+	if { $ora_compatible eq "true" } {
 set sql(1) { CREATE OR REPLACE FUNCTION DBMS_RANDOM (INTEGER, INTEGER) RETURNS INTEGER AS $$
 DECLARE
     start_int ALIAS FOR $1;
@@ -857,17 +860,17 @@ return
 }
 
 proc GatherStatistics { lda } {
-puts "GATHERING SCHEMA STATISTICS"
-set sql(1) "ANALYZE"
-for { set i 1 } { $i <= 1 } { incr i } {
-set result [ pg_exec $lda $sql($i) ]
-if {[pg_result $result -status] != "PGRES_COMMAND_OK"} {
-error "[pg_result $result -error]"
-	} else {
-pg_result $result -clear
+	puts "GATHERING SCHEMA STATISTICS"
+	set sql(1) "ANALYZE"
+	for { set i 1 } { $i <= 1 } { incr i } {
+		set result [ pg_exec $lda $sql($i) ]
+		if {[pg_result $result -status] != "PGRES_COMMAND_OK"} {
+			error "[pg_result $result -error]"
+		} else {
+			pg_result $result -clear
+		}
 	}
-    }
-return
+	return
 }
 
 proc ConnectToPostgres { host port user password dbname } {
@@ -978,24 +981,24 @@ return $tstamp
 proc NURand { iConst x y C } {return [ expr {((([RandomNumber 0 $iConst] | [RandomNumber $x $y]) + $C) % ($y - $x + 1)) + $x }]}
 
 proc Lastname { num namearr } {
-set name [ concat [ lindex $namearr [ expr {( $num / 100 ) % 10 }] ][ lindex $namearr [ expr {( $num / 10 ) % 10 }] ][ lindex $namearr [ expr {( $num / 1 ) % 10 }]]]
-return $name
+	set name [ concat [ lindex $namearr [ expr {( $num / 100 ) % 10 }] ][ lindex $namearr [ expr {( $num / 10 ) % 10 }] ][ lindex $namearr [ expr {( $num / 1 ) % 10 }]]]
+	return $name
 }
 
 proc MakeAlphaString { x y chArray chalen } {
-set len [ RandomNumber $x $y ]
-for {set i 0} {$i < $len } {incr i } {
-append alphastring [lindex $chArray [ expr {int(rand()*$chalen)}]]
-}
-return $alphastring
+	set len [ RandomNumber $x $y ]
+	for {set i 0} {$i < $len } {incr i } {
+		append alphastring [lindex $chArray [ expr {int(rand()*$chalen)}]]
+	}
+	return $alphastring
 }
 
 proc Makezip { } {
-set zip "000011111"
-set ranz [ RandomNumber 0 9999 ]
-set len [ expr {[ string length $ranz ] - 1} ]
-set zip [ string replace $zip 0 $len $ranz ]
-return $zip
+	set zip "000011111"
+	set ranz [ RandomNumber 0 9999 ]
+	set len [ expr {[ string length $ranz ] - 1} ]
+	set zip [ string replace $zip 0 $len $ranz ]
+	return $zip
 }
 
 proc MakeAddress { chArray chalen } {
@@ -1003,96 +1006,104 @@ return [ list [ MakeAlphaString 10 20 $chArray $chalen ] [ MakeAlphaString 10 20
 }
 
 proc MakeNumberString { } {
-set zeroed "00000000"
-set a [ RandomNumber 0 99999999 ] 
-set b [ RandomNumber 0 99999999 ] 
-set lena [ expr {[ string length $a ] - 1} ]
-set lenb [ expr {[ string length $b ] - 1} ]
-set c_pa [ string replace $zeroed 0 $lena $a ]
-set c_pb [ string replace $zeroed 0 $lenb $b ]
-set numberstring [ concat $c_pa$c_pb ]
-return $numberstring
+	set zeroed "00000000"
+	set a [ RandomNumber 0 99999999 ] 
+	set b [ RandomNumber 0 99999999 ] 
+	set lena [ expr {[ string length $a ] - 1} ]
+	set lenb [ expr {[ string length $b ] - 1} ]
+	set c_pa [ string replace $zeroed 0 $lena $a ]
+	set c_pb [ string replace $zeroed 0 $lenb $b ]
+	set numberstring [ concat $c_pa$c_pb ]
+	return $numberstring
 }
 
 proc my_lpick list {
     lindex $list [expr {int(rand()*[llength $list])}]
 }
 
+proc listFromFile {filename} {
+    set f [open $filename r]
+    set data [split [string trim [read $f]]]
+    close $f
+    return $data
+}
+
 proc Customer { lda d_id w_id CUST_PER_DIST ora_compatible } {
-set globArray [ list 0 1 2 3 4 5 6 7 8 9 A B C D E F G H I J K L M N O P Q R S T U V W X Y Z a b c d e f g h i j k l m n o p q r s t u v w x y z ]
-set namearr [list BAR OUGHT ABLE PRI PRES ESE ANTI CALLY ATION EING]
-set chalen [ llength $globArray ]
-set bld_cnt 1
-set c_d_id $d_id
-set c_w_id $w_id
-set c_middle "OE"
-set c_balance -10.0
-set c_credit_lim 50000
-set h_amount 10.0
-if { $ora_compatible eq "true" } {
-proc date_function {} {
-set df "to_date('[ gettimestamp ]','YYYYMMDDHH24MISS')"
-return $df
-}
-	} else {
-proc date_function {} {
-set df "to_timestamp('[ gettimestamp ]','YYYYMMDDHH24MISS')"
-return $df
-}
-	}
-puts "Loading Customer for DID=$d_id WID=$w_id"
-for {set c_id 1} {$c_id <= $CUST_PER_DIST } {incr c_id } {
-set c_first [ MakeAlphaString 8 16 $globArray $chalen ]
-if { $c_id <= 1000 } {
-set c_last [ Lastname [ expr {$c_id - 1} ] $namearr ]
-	} else {
-set nrnd [ NURand 255 0 999 123 ]
-set c_last [ Lastname $nrnd $namearr ]
-	}
-set c_add [ MakeAddress $globArray $chalen ]
-set c_phone [ MakeNumberString ]
-if { [RandomNumber 0 1] eq 1 } {
-set c_credit "GC"
-	} else {
-set c_credit "BC"
-	}
-set disc_ran [ RandomNumber 0 50 ]
-set c_discount [ expr {$disc_ran / 100.0} ]
-set c_data [ MakeAlphaString 300 500 $globArray $chalen ]
-set my_values { admin manager customer hokage jew machine }
-set res_up  [my_lpick $my_values]
-set res_del [my_lpick $my_values]
-set res_sel  [my_lpick $my_values]
-append c_val_list ('$c_id', '$c_d_id', '$c_w_id', '$c_first', '$c_middle', '$c_last', '[ lindex $c_add 0 ]', '[ lindex $c_add 1 ]', '[ lindex $c_add 2 ]', '[ lindex $c_add 3 ]', '[ lindex $c_add 4 ]', '$c_phone', [ date_function ], '$c_credit', '$c_credit_lim', '$c_discount', '$c_balance', '$c_data', '10.0', '1', '0', '$res_up', '$res_del', '$res_sel')
-set h_data [ MakeAlphaString 12 24 $globArray $chalen ]
-append h_val_list ('$c_id', '$c_d_id', '$c_w_id', '$c_w_id', '$c_d_id', [ date_function ], '$h_amount', '$h_data')
-if { $bld_cnt<= 999 } { 
-append c_val_list ,
-append h_val_list ,
-	}
-incr bld_cnt
-if { ![ expr {$c_id % 1000} ] } {
-set result [ pg_exec $lda "insert into customer (c_id, c_d_id, c_w_id, c_first, c_middle, c_last, c_street_1, c_street_2, c_city, c_state, c_zip, c_phone, c_since, c_credit, c_credit_lim, c_discount, c_balance, c_data, c_ytd_payment, c_payment_cnt, c_delivery_cnt, RECORD_UPDATE, RECORD_DELETE, RECORD_SELECT) values $c_val_list" ]
-if {[pg_result $result -status] != "PGRES_COMMAND_OK"} {
-            error "[pg_result $result -error]"
-        } else {
-	pg_result $result -clear
-	}
-set result [ pg_exec $lda "insert into history (h_c_id, h_c_d_id, h_c_w_id, h_w_id, h_d_id, h_date, h_amount, h_data) values $h_val_list" ]
-if {[pg_result $result -status] != "PGRES_COMMAND_OK"} {
-            error "[pg_result $result -error]"
-        } else {
-	pg_result $result -clear
-	}
-	set result [ pg_exec $lda "commit" ]
-	pg_result $result -clear
+	set globArray [ list 0 1 2 3 4 5 6 7 8 9 A B C D E F G H I J K L M N O P Q R S T U V W X Y Z a b c d e f g h i j k l m n o p q r s t u v w x y z ]
+	set namearr [list BAR OUGHT ABLE PRI PRES ESE ANTI CALLY ATION EING]
+	set chalen [ llength $globArray ]
 	set bld_cnt 1
-	unset c_val_list
-	unset h_val_list
+	set c_d_id $d_id
+	set c_w_id $w_id
+	set c_middle "OE"
+	set c_balance -10.0
+	set c_credit_lim 50000
+	set h_amount 10.0
+	set my_values [listFromFile "config/values.txt"]
+	puts "MY_VALUES: $my_values"
+	if { $ora_compatible eq "true" } {
+		proc date_function {} {
+			set df "to_date('[ gettimestamp ]','YYYYMMDDHH24MISS')"
+			return $df
+		}
+		} else {
+			proc date_function {} {
+				set df "to_timestamp('[ gettimestamp ]','YYYYMMDDHH24MISS')"
+			return $df
 		}
 	}
-puts "Customer Done"
-return
+	puts "Loading Customer for DID=$d_id WID=$w_id"
+	for {set c_id 1} {$c_id <= $CUST_PER_DIST } {incr c_id } {
+		set c_first [ MakeAlphaString 8 16 $globArray $chalen ]
+		if { $c_id <= 1000 } {
+		set c_last [ Lastname [ expr {$c_id - 1} ] $namearr ]
+			} else {
+		set nrnd [ NURand 255 0 999 123 ]
+		set c_last [ Lastname $nrnd $namearr ]
+			}
+		set c_add [ MakeAddress $globArray $chalen ]
+		set c_phone [ MakeNumberString ]
+		if { [RandomNumber 0 1] eq 1 } {
+		set c_credit "GC"
+			} else {
+		set c_credit "BC"
+			}
+		set disc_ran [ RandomNumber 0 50 ]
+		set c_discount [ expr {$disc_ran / 100.0} ]
+		set c_data [ MakeAlphaString 300 500 $globArray $chalen ]
+		set res_up  [my_lpick $my_values]
+		set res_del [my_lpick $my_values]
+		set res_sel  [my_lpick $my_values]
+		append c_val_list ('$c_id', '$c_d_id', '$c_w_id', '$c_first', '$c_middle', '$c_last', '[ lindex $c_add 0 ]', '[ lindex $c_add 1 ]', '[ lindex $c_add 2 ]', '[ lindex $c_add 3 ]', '[ lindex $c_add 4 ]', '$c_phone', [ date_function ], '$c_credit', '$c_credit_lim', '$c_discount', '$c_balance', '$c_data', '10.0', '1', '0', '$res_up', '$res_del', '$res_sel')
+		set h_data [ MakeAlphaString 12 24 $globArray $chalen ]
+		append h_val_list ('$c_id', '$c_d_id', '$c_w_id', '$c_w_id', '$c_d_id', [ date_function ], '$h_amount', '$h_data')
+		if { $bld_cnt<= 999 } { 
+		append c_val_list ,
+		append h_val_list ,
+			}
+		incr bld_cnt
+		if { ![ expr {$c_id % 1000} ] } {
+		set result [ pg_exec $lda "insert into customer (c_id, c_d_id, c_w_id, c_first, c_middle, c_last, c_street_1, c_street_2, c_city, c_state, c_zip, c_phone, c_since, c_credit, c_credit_lim, c_discount, c_balance, c_data, c_ytd_payment, c_payment_cnt, c_delivery_cnt, RECORD_UPDATE, RECORD_DELETE, RECORD_SELECT) values $c_val_list" ]
+		if {[pg_result $result -status] != "PGRES_COMMAND_OK"} {
+					error "[pg_result $result -error]"
+				} else {
+			pg_result $result -clear
+			}
+		set result [ pg_exec $lda "insert into history (h_c_id, h_c_d_id, h_c_w_id, h_w_id, h_d_id, h_date, h_amount, h_data) values $h_val_list" ]
+		if {[pg_result $result -status] != "PGRES_COMMAND_OK"} {
+					error "[pg_result $result -error]"
+				} else {
+			pg_result $result -clear
+			}
+			set result [ pg_exec $lda "commit" ]
+			pg_result $result -clear
+			set bld_cnt 1
+			unset c_val_list
+			unset h_val_list
+				}
+		}
+	puts "Customer Done"
+	return
 }
 
 proc Orders { lda d_id w_id MAXITEMS ORD_PER_DIST ora_compatible } {
@@ -1510,10 +1521,10 @@ CreateIndexes $lda
 CreateStoredProcs $lda $ora_compatible
 GatherStatistics $lda 
 puts "[ string toupper $user ] SCHEMA COMPLETE"
-pg_disconnect $lda
-return
+	pg_disconnect $lda
+	return
 	}
-    }
+}
 
 
 
@@ -1525,9 +1536,9 @@ set super_user_db [lindex $argv 4]
 set warehouses [lindex $argv 5]
 set virtual_users [lindex $argv 6]
 
-set user_name "tpcc"
-set user_pass "tpcc"
-set user_db "tpcc"
+set user_db [lindex $argv 7]
+set user_name [lindex $argv 8]
+set user_pass [lindex $argv 9]
 set enterprise_compat false
 
 puts "============================================="
