@@ -23,8 +23,8 @@ function run_view() {
     load_tests_scripts
 }
 
-container_init
-time load_database
+#container_init
+#time load_database
 
 function run_policy() {
     load_senarios_script "policy"
