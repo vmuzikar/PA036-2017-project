@@ -1533,4 +1533,3 @@ puts "============================================="
 puts ""
 
 do_tpcc $hostname $port $warehouses $super_user_name $super_user_pass $super_user_db $user_name $user_pass $user_db $enterprise_compat $virtual_users
-

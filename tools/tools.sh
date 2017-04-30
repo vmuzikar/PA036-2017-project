@@ -1,0 +1,41 @@
+
+function load_script() {
+    echo "[INFO] Loading script: ${1}"
+    source "${1}"
+}
+
+function load_dir_scripts() {
+    DIR_PATH=$1
+    for f in `ls "${DIR_PATH}"/*.sh | sort`; do
+        load_script "${f}"
+    done
+}
+
+function load_init_scripts() {
+    load_dir_scripts "${BASE_DIR}/init"
+}
+
+function load_tests_scripts() {
+    load_dir_scripts "${BASE_DIR}/tests/${1}"
+}
+
+function load_senarios_script() {
+    load_dir_scripts "${BASE_DIR}/scenarios/${1}"
+}
+
+function exec_query()
+{
+    query=${1}
+    psql -h "${HOST}" -U "${SUPER_USER_NAME}" -d "${DB_NAME}" -c "${query}"
+}
+
+function exec_file() {
+    file=${1}
+    psql -h "${HOST}" -U "${SUPER_USER_NAME}" -d "${DB_NAME}" -f "${file}"
+}
+
+function dump_database() {
+    pg_dump -h ${HOST} -p ${PORT} -U "${SUPER_USER_NAME}" "${DB_NAME}" > "${DB_DUMP_FILE}" 
+}
+
+

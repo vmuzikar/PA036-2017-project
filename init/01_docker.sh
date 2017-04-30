@@ -1,13 +1,6 @@
 #! /bin/bash
 
-CONTAINER_NAME=${1:-"pgdb"}
-IMAGE_NAME="postgres:latest"
-PORT=5432
-USER="postgres"
-PASS="${USER}"
 DAEMON="-d"
-
-
 
 function test_running(){
     docker inspect -f "{{.State.Running}}" "${1}"
