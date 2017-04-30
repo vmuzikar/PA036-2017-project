@@ -35,7 +35,12 @@ function exec_file() {
 }
 
 function dump_database() {
-    pg_dump -h ${HOST} -p ${PORT} -U "${SUPER_USER_NAME}" "${DB_NAME}" > "${DB_DUMP_FILE}" 
+    pg_dump -h "${HOST}" -p "${PORT}" -U "${SUPER_USER_NAME}" "${DB_NAME}" > "${DB_DUMP_FILE}" 
 }
 
+
+function load_database() {
+    psql -h "${HOST}" -U "${SUPER_USER_NAME}" -c "CREATE USER ${DB_USER} PASSWORD '${DB_USER_PASS}'"
+    psql -h "${HOST}" -U "${SUPER_USER_NAME}" -f "${DB_DUMP_FILE}" "postgres"
+}
 

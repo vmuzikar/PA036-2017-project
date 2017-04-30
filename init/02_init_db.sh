@@ -63,7 +63,6 @@ while getopts ":X:H:p:P:d:u:U:W:D:h" opt; do
   esac
 done
 
-sleep 5
 
 EXEC_CREATE="${PATH_HDB_TCLSH} ${PATH_CREATE_FILE} ${HOST} ${PORT} ${SUPER_USER_NAME} ${SUPER_USER_PASS} ${ADMIN_DB_NAME} ${WAREHOUSES} ${USERS} ${DB_NAME} ${DB_USER} ${DB_USER_PASS}"
 
