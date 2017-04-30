@@ -8,6 +8,7 @@ PASS="${USER}"
 DAEMON="-d"
 
 
+
 function test_running(){
     docker inspect -f "{{.State.Running}}" "${1}"
 }

@@ -17,14 +17,14 @@ function show_help()
 {
       echo "Usage: ./create_db.sh [OPTIONS]"
       echo -e " OPTIONS:"
-      echo -e "\t -d Database name"
-      echo -e "\t -H Host name"
-      echo -e "\t -u Super user name"
-      echo -e "\t -P Super user pass"
-      echo -e "\t -D User db"
-      echo -e "\t -U Users"
-      echo -e "\t -W Warehouses"
-      echo -e "\t -p port number"
+      echo -e "\t -d Database name (default: ${DB_NAME})"
+      echo -e "\t -H Host name (default: ${HOST})"
+      echo -e "\t -u Super user name (default: ${SUPER_USER_NAME})"
+      echo -e "\t -P Super user pass (default: ${SUPER_USER_PASS})"
+      echo -e "\t -U Users (default: ${USERS})"
+      echo -e "\t -W Warehouses (default: ${WAREHOUSES})"
+      echo -e "\t -p port number (default: ${PORT})"
+      echo -e "\t -X HAMMER_DB installation path (default: ${PATH_HAMMERDB})"
 }
 
 function exec_query()
@@ -34,8 +34,11 @@ function exec_query()
 }
 
 
-while getopts ":H:p:P:d:u:U:W:h" opt; do
+while getopts ":X:H:p:P:d:u:U:W:h" opt; do
   case $opt in
+    X)
+        PATH_HAMMERDB=${OPTARG}
+        ;;
     H)
         HOST=${OPTARG}
         ;;
