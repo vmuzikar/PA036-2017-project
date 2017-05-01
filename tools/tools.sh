@@ -23,6 +23,14 @@ function load_senarios_script() {
     load_dir_scripts "${BASE_DIR}/scenarios/${1}"
 }
 
+function load_sql_scripts() {
+    DIR_PATH=$1
+    for f in `ls "${DIR_PATH}"/*.sql | sort`; do
+        echo -e "\t[INFO] Loading file: ${f}"
+        exec_file "${f}"
+    done
+}
+
 function exec_query()
 {
     query=${1}

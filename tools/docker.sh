@@ -24,6 +24,13 @@ function container_start {
     echo "[INFO] Starting container ${CONTAINER_NAME}"
     docker run ${DAEMON} --name "${CONTAINER_NAME}" -p 5432:5432 -e POSTGRES_USER="${USER}" -e POSTGRES_PASSWORD="${PASS}" "${IMAGE_NAME}"
 }
+function container_wait_for_avail {
+    until nc -z $(sudo docker inspect --format='{{.NetworkSettings.IPAddress}}' $CONTAINER_NAME) 5432
+    do
+        echo "[DEBUG] waiting for $CONTAINER_NAME container..."
+        sleep 1.5
+    done
+}
 
 
 function container_init {
@@ -39,7 +46,7 @@ function container_init {
 
     container_start
 
-    sleep 5
+    container_wait_for_avail
 }
 
 
