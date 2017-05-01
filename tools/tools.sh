@@ -17,9 +17,11 @@ function load_init_scripts() {
 
 function load_tests_scripts() {
     path="${BASE_DIR}/tests/"
+
     if [ "${1}" != "" ]; then
         path="${path}/${1}"
-    else
+    fi
+
     load_dir_scripts "${path}"
 }
 
