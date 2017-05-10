@@ -21,6 +21,11 @@ function dump_database() {
     pg_dump -h "${HOST}" -p "${PORT}" -U "${SUPER_USER_NAME}" "${DB_NAME}" > "${DB_DUMP_FILE}" 
 }
 
+function dump_global() {
+    pg_dump -h "${HOST}" -p "${PORT}" -U "${SUPER_USER_NAME}" -g > "${DB_DUMP_USER}"
+}
+
+
 # Loads database from dump and creates required user
 function load_database() {
     psql -h "${HOST}" -U "${SUPER_USER_NAME}" -c "CREATE USER ${DB_USER} PASSWORD '${DB_USER_PASS}'"
