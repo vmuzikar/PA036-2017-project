@@ -61,7 +61,7 @@ done
 
 source "${BASE_DIR}/config/${CONFIG_NAME}.conf"
 source "${BASE_DIR}/tools/tools.sh"
-source "${BASE_DIR}/tools/docker.sh"
+load_dir_scripts "${BASE_DIR}/tools"
 
 
 function run_scenario() {    
