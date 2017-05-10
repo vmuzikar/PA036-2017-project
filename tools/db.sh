@@ -73,7 +73,7 @@ function db_user_grant_table()
 {
     table=$1
     user=$2
-    perm=${3-"ALL"}
+    perm=${3:-"ALL"}
     echo "[INFO] Granting [${perm}] for ${user} on ${table}"
     exec_query "GRANT ${perm} ON ${table} TO ${user}"
 }
