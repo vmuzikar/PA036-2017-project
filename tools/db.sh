@@ -44,3 +44,36 @@ function load_sql_scripts() {
         exec_file "${f}"
     done
 }
+
+# Creates user in database
+# @param $1 - username
+function db_user_create()
+{
+    user=${1}
+    echo "[INFO] Creating user: ${user}"
+    exec_query "CREATE USER ${user};"
+}
+
+# Grants user to user
+# @param $1 - who
+# @param $2 - to which
+function db_user_grant_user()
+{
+    who=$1
+    to=$2
+    echo "[INFO] Granting user '${who}' TO ${to}"
+    exec_query "GRANT ${who} TO ${to};"
+}
+
+# Grants user to table with permissions
+# @param $1 - who
+# @param $2 - to which
+# @param $3 - permissions
+function db_user_grant_table()
+{
+    table=$1
+    user=$2
+    perm=${3-"ALL"}
+    echo "[INFO] Granting [${perm}] for ${user} on ${table}"
+    exec_query "GRANT ${perm} ON ${table} TO ${user}"
+}
