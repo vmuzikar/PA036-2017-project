@@ -10,18 +10,15 @@
 
 ## Initialization
 ### Using **bash**:
-* Run: ``$ ./init_db.sh -h`` for help
+* Run: ``$ ./start.sh -h`` for help
 * You need to know where hammer db is installed. You have to use it's bundled tclsh.
-* You can either edit ``init_db.sh`` or provide sufficient arguments
+* You can either edit ``start.sh`` or provide sufficient arguments
 * Init DB will initialize database calling ``create.tcl``, which has been modified to accept command line arguments.
 * You need to setup variables properly ``hostname, username, pass, ...``
 
 
 ## Initialization using docker (optional):
-### Run ``docker.sh``
-* ``$ ./docker.sh`` Will pull postgress image, and run it.
-* If you already have running container with specified name, it will stop it and remove it and run it again.
-```bash
+
 ## DEFAULT PROPERTIES:
 CONTAINER_NAME="pgdb"
 IMAGE_NAME="postgres:latest"

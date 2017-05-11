@@ -1,7 +1,8 @@
+source "${BASE_DIR}/tools/00_logging.sh"
 
 # Wrapper over shell script load
 function load_script() {
-    echo "[INFO] Loading script: ${1}"
+    log_info "Loading script: ${1}"
     source "${1}"
 }
 
