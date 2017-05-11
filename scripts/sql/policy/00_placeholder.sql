@@ -10,9 +10,9 @@ CREATE POLICY insert_customer ON customer FOR INSERT WITH CHECK (true);
 
 CREATE POLICY select_orders ON orders FOR SELECT USING ( 
 	((o_c_id,o_w_id,o_d_id) IN (SELECT c_id,c_w_id,c_d_id FROM customer)) );
-CREATE POLICY select_orders ON orders FOR DELETE USING ( 
+CREATE POLICY delete_orders ON orders FOR DELETE USING ( 
 	((o_c_id,o_w_id,o_d_id) IN (SELECT c_id,c_w_id,c_d_id FROM customer)) );
-CREATE POLICY select_orders ON orders FOR UPDATE USING ( 
+CREATE POLICY update_orders ON orders FOR UPDATE USING ( 
 	((o_c_id,o_w_id,o_d_id) IN (SELECT c_id,c_w_id,c_d_id FROM customer)) );
 CREATE POLICY insert_customer ON orders FOR INSERT WITH CHECK (true);
 
