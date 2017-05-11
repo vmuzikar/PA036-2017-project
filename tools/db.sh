@@ -1,3 +1,6 @@
+HOST_PORT=" -h ${HOST} -p ${PORT} -U ${SUPER_USER_NAME}"
+HOST_PORT_SUPER="${HOST_PORT} "
+
 # Function executes query
 # @param $1 - query string
 # @param $2 - user that will execute the query
@@ -13,24 +16,42 @@ function exec_query()
 function exec_file() {
     file=${1}
     user=${2:-${SUPER_USER_NAME}}
-    psql -h "${HOST}" -U "${user}" -d "${DB_NAME}" -f "${file}"
+    psql ${HOST_PORT} -U "${user}" -d "${DB_NAME}" -f "${file}"
 }
 
 # Function dumps database
 function dump_database() {
-    pg_dump -h "${HOST}" -p "${PORT}" -U "${SUPER_USER_NAME}" "${DB_NAME}" > "${DB_DUMP_FILE}" 
+    set -x
+    pg_dump ${HOST_PORT_SUPER} "${DB_NAME}" > "${DB_DUMP_FILE}" 
+    set +x
+
 }
 
+# Function dumps database users
 function dump_global() {
-    pg_dump -h "${HOST}" -p "${PORT}" -U "${SUPER_USER_NAME}" -g > "${DB_DUMP_USER}"
+    set -x
+    pg_dumpall ${HOST_PORT_SUPER} -g > "${DB_DUMP_USER}"
+    set +x
+}
+
+# Loads dump from file to database
+# @param $1 - filepath
+# @param $2 - dbname
+function load_dump() {
+    log_info "Loading database from dump \"$1\" to [${2}]"
+    psql ${HOST_PORT_SUPER} -f "${1}" "${2}"
 }
 
 
 # Loads database from dump and creates required user
 function load_database() {
-    psql -h "${HOST}" -U "${SUPER_USER_NAME}" -c "CREATE USER ${DB_USER} PASSWORD '${DB_USER_PASS}'"
-    psql -h "${HOST}" -U "${SUPER_USER_NAME}" -c "ALTER USER ${DB_USER} WITH SUPERUSER"
-    psql -h "${HOST}" -U "${SUPER_USER_NAME}" -f "${DB_DUMP_FILE}" "postgres"
+    psql ${HOST_PORT_SUPER} -c "CREATE USER ${DB_USER} PASSWORD '${DB_USER_PASS}';"
+    psql ${HOST_PORT_SUPER} -c "ALTER USER ${DB_USER} WITH SUPERUSER;"
+    psql ${HOST_PORT_SUPER} -c "CREATE DATABASE ${DB_USER_PASS} OWNER ${DB_USER};"
+
+    load_dump "${DB_DUMP_USER}" "${ADMIN_DB_NAME}"
+    load_dump "${DB_DUMP_FILE}" "${DB_USER_PASS}"
+    log_info "Loading ended"
 }
 
 # Function executes timed query 
@@ -40,13 +61,24 @@ function exec_timed_query() {
     exec_query "\timing off"
 }
 
-# Functil will load all scripts from specified directory
+# Function will load all scripts from specified directory
 # @param $1 - directory from which all the files will be loaded
 function load_sql_scripts() {
     DIR_PATH=$1
     for f in `ls "${DIR_PATH}"/*.sql | sort`; do
-        echo -e "\t[INFO] Loading file: ${f}"
+        log_info "   Loading file: ${f}"
         exec_file "${f}"
+    done
+}
+# Function will load all scripts from specified directory
+# @param $1 - directory from which all the files will be loaded
+function load_sql_pretty_scripts() {
+    DIR_PATH=$1
+    NAME_OUT=$2
+    OUT="${PATH_OUT}/${NAME_OUT}.log"
+    for f in `ls "${DIR_PATH}"/*.sql | sort`; do
+        echo -e "\nRESULTS: ${f} ---" >> $OUT
+        exec_file "${f}" >> $OUT
     done
 }
 
@@ -55,7 +87,7 @@ function load_sql_scripts() {
 function db_user_create()
 {
     user=${1}
-    echo "[INFO] Creating user: ${user}"
+    log_info "Creating user: ${user}"
     exec_query "CREATE USER ${user};"
 }
 
@@ -66,7 +98,7 @@ function db_user_grant_user()
 {
     who=$1
     to=$2
-    echo "[INFO] Granting user '${who}' TO ${to}"
+    log_info "Granting user '${who}' TO ${to}"
     exec_query "GRANT ${who} TO ${to};"
 }
 
@@ -79,6 +111,6 @@ function db_user_grant_table()
     table=$1
     user=$2
     perm=${3:-"ALL"}
-    echo "[INFO] Granting [${perm}] for ${user} on ${table}"
+    log_info "Granting [${perm}] for ${user} on ${table}"
     exec_query "GRANT ${perm} ON ${table} TO ${user}"
 }

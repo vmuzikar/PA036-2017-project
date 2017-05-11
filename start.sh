@@ -2,7 +2,7 @@
 
 export FILE_BASE=`realpath $0`
 export BASE_DIR=`dirname ${FILE_BASE}`
-export CONFIG_NAME=${1:-"default"}
+export CONFIG_NAME="default"
 
 LOAD_DB=0
 DUMP_DB=1
@@ -48,18 +48,31 @@ while getopts ":c:ldkths:" opt; do
     ;;
     h)
         show_help
+        exit 0
     ;;
     \?)
       echo "Invalid option: -$OPTARG" >&2
       show_help
+      exit 1
       ;;
       *)
       show_help
+      exit 1
       ;;
   esac
 done
 
+META_CONFIG="${BASE_DIR}/config/_${CONFIG_NAME}.conf"
+
+echo "[INFO] Loading config \"${CONFIG_NAME}\""
 source "${BASE_DIR}/config/${CONFIG_NAME}.conf"
+
+if [ -e "${META_CONFIG}" ]; then
+    echo "[INFO] Loading meta config \"_${CONFIG_NAME}\""
+
+    source "${META_CONFIG}"
+fi
+
 source "${BASE_DIR}/tools/tools.sh"
 load_dir_scripts "${BASE_DIR}/tools"
 
@@ -75,11 +88,11 @@ fi
 # RUN INIT VIEW
 
 if [ $LOAD_DB -eq 1 ] ; then
-    echo "[INFO] Loading database from dump ${DB_DUMP_FILE}"
+    log_info "Loading database from dump ${DB_DUMP_FILE}"
     load_database
 
 else # Run init scripts
-    echo "[INFO] Loading database using init"
+    log_info "Loading database using init"
     load_init_scripts
 fi
 
@@ -88,7 +101,7 @@ if [ "$SCENARIO_NAME" != "" ]; then
 fi
 
 if [ $TEST_RUN -eq 1 ]; then
-    load_tests_scripts
+    load_tests_scripts "simple"
 fi
 
 if [ $DOCKER_KILL -eq 1 ] ; then
