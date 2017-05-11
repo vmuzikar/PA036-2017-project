@@ -10,7 +10,7 @@ TEST_RUN=1
 SCENARIO_NAME="policy"
 DOCKER_START=1
 DOCKER_KILL=0
-
+RUN_TEST_SCENARIO="simple"
 function show_help()
 {
       echo "Usage: ./start.sh [OPTIONS]"
@@ -20,13 +20,14 @@ function show_help()
       echo -e "\t -s (NAME) Run scenario(default: ${SCENARIO_NAME})"
       echo -e "\t -d Do not start docker container (default: no)"
       echo -e "\t -t Do not run tests (default: no)"
+      echo -e "\t -T Run specific test (default: ${RUN_TEST_SCENARIO})"
       echo -e "\t -k Kill docker after run (default: no)"
       echo -e "\t -h show help"
 }
 
 
 
-while getopts ":c:ldkths:" opt; do
+while getopts ":T:c:ldkths:" opt; do
   case $opt in
     c)
       export CONFIG_NAME=${OPTARG}
@@ -42,6 +43,9 @@ while getopts ":c:ldkths:" opt; do
     ;;
     t)
         TEST_RUN=0
+    ;;
+    T)
+        RUN_TEST_SCENARIO=${OPTARG}
     ;;
     k)
         DOCKER_KILL=1
@@ -101,7 +105,7 @@ if [ "$SCENARIO_NAME" != "" ]; then
 fi
 
 if [ $TEST_RUN -eq 1 ]; then
-    load_tests_scripts "simple"
+    load_tests_scripts "$RUN_TEST_SCENARIO"
 fi
 
 if [ $DOCKER_KILL -eq 1 ] ; then

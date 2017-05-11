@@ -2,15 +2,15 @@
 if [catch {package require Pgtcl} ] { error "Failed to load Pgtcl - Postgres Library Error" }
 
 #EDITABLE OPTIONS##################################################
-set total_iterations 1000000 ;# Number of transactions before logging off
+set total_iterations [lindex $argv 0] ;# Number of transactions before logging off
 set RAISEERROR "false" ;# Exit script on PostgreSQL (true or false)
 set KEYANDTHINK "false" ;# Time for user thinking and keying (true or false)
 set ora_compatible "false" ;#Postgres Plus Oracle Compatible Schema
-set host "localhost" ;# Address of the server hosting PostgreSQL
-set port "5432" ;# Port of the PostgreSQL Server
-set user "tpcc" ;# PostgreSQL user
-set password "tpcc" ;# Password for the PostgreSQL user
-set db "tpcc" ;# Database containing the TPC Schema
+set host [lindex $argv 1] ;# Address of the server hosting PostgreSQL
+set port [lindex $argv 2] ;# Port of the PostgreSQL Server
+set user [lindex $argv 3];# PostgreSQL user
+set password [lindex $argv 3] ;# Password for the PostgreSQL user
+set db [lindex $argv 3] ;# Database containing the TPC Schema
 #EDITABLE OPTIONS##################################################
 
 #RANDOM NUMBER
