@@ -1,4 +1,5 @@
 #!/usr/local/bin/tclsh8.6
+if [catch {package require Thread} ] { error "Failed to load Thread library" }
 if [catch {package require Pgtcl} ] { error "Failed to load Pgtcl - Postgres Library Error" }
 
 #EDITABLE OPTIONS##################################################
@@ -9,8 +10,8 @@ set ora_compatible "false" ;#Postgres Plus Oracle Compatible Schema
 set host [lindex $argv 1] ;# Address of the server hosting PostgreSQL
 set port [lindex $argv 2] ;# Port of the PostgreSQL Server
 set user [lindex $argv 3];# PostgreSQL user
-set password [lindex $argv 3] ;# Password for the PostgreSQL user
-set db [lindex $argv 3] ;# Database containing the TPC Schema
+set password [lindex $argv 4] ;# Password for the PostgreSQL user
+set db [lindex $argv 5] ;# Database containing the TPC Schema
 #EDITABLE OPTIONS##################################################
 
 #RANDOM NUMBER
