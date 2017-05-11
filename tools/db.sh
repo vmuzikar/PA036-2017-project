@@ -1,4 +1,5 @@
-HOST_PORT=" -h ${HOST} -p ${PORT}"
+HOST_PORT=" -h ${HOST} -p ${PORT} -U ${SUPER_USER_NAME}"
+HOST_PORT_SUPER="${HOST_PORT} "
 
 # Function executes query
 # @param $1 - query string
@@ -21,7 +22,7 @@ function exec_file() {
 # Function dumps database
 function dump_database() {
     set -x
-    pg_dump ${HOST_PORT} -U "${SUPER_USER_NAME}" "${DB_NAME}" > "${DB_DUMP_FILE}" 
+    pg_dump ${HOST_PORT_SUPER} "${DB_NAME}" > "${DB_DUMP_FILE}" 
     set +x
 
 }
@@ -29,21 +30,24 @@ function dump_database() {
 # Function dumps database users
 function dump_global() {
     set -x
-    pg_dumpall ${HOST_PORT} -U "${SUPER_USER_NAME}" -g > "${DB_DUMP_USER}"
+    pg_dumpall ${HOST_PORT_SUPER} -g > "${DB_DUMP_USER}"
     set +x
 }
 
+# Loads dump from file to database
+# @param $1 - filepath
+# @param $2 - dbname
 function load_dump() {
     log_info "Loading database from dump \"$1\" to [${2}]"
-    psql ${HOST_PORT} -U "${SUPER_USER_NAME}" -f "${1}" "${2}"
+    psql ${HOST_PORT_SUPER} -f "${1}" "${2}"
 }
 
 
 # Loads database from dump and creates required user
 function load_database() {
-    psql ${HOST_PORT} -U "${SUPER_USER_NAME}" -c "CREATE USER ${DB_USER} PASSWORD '${DB_USER_PASS}';"
-    psql ${HOST_PORT} -U "${SUPER_USER_NAME}" -c "ALTER USER ${DB_USER} WITH SUPERUSER;"
-    psql ${HOST_PORT} -U "${SUPER_USER_NAME}" -c "CREATE DATABASE ${DB_USER_PASS} OWNER ${DB_USER};"
+    psql ${HOST_PORT_SUPER} -c "CREATE USER ${DB_USER} PASSWORD '${DB_USER_PASS}';"
+    psql ${HOST_PORT_SUPER} -c "ALTER USER ${DB_USER} WITH SUPERUSER;"
+    psql ${HOST_PORT_SUPER} -c "CREATE DATABASE ${DB_USER_PASS} OWNER ${DB_USER};"
 
     load_dump "${DB_DUMP_USER}" "${ADMIN_DB_NAME}"
     load_dump "${DB_DUMP_FILE}" "${DB_USER_PASS}"
@@ -57,13 +61,24 @@ function exec_timed_query() {
     exec_query "\timing off"
 }
 
-# Functil will load all scripts from specified directory
+# Function will load all scripts from specified directory
 # @param $1 - directory from which all the files will be loaded
 function load_sql_scripts() {
     DIR_PATH=$1
     for f in `ls "${DIR_PATH}"/*.sql | sort`; do
-        log_info "\t Loading file: ${f}"
+        log_info "   Loading file: ${f}"
         exec_file "${f}"
+    done
+}
+# Function will load all scripts from specified directory
+# @param $1 - directory from which all the files will be loaded
+function load_sql_pretty_scripts() {
+    DIR_PATH=$1
+    NAME_OUT=$2
+    OUT="${PATH_OUT}/${NAME_OUT}.log"
+    for f in `ls "${DIR_PATH}"/*.sql | sort`; do
+        echo -e "\nRESULTS: ${f} ---" >> $OUT
+        exec_file "${f}" >> $OUT
     done
 }
 

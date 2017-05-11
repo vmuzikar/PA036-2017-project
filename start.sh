@@ -101,7 +101,7 @@ if [ "$SCENARIO_NAME" != "" ]; then
 fi
 
 if [ $TEST_RUN -eq 1 ]; then
-    load_tests_scripts
+    load_tests_scripts "simple"
 fi
 
 if [ $DOCKER_KILL -eq 1 ] ; then

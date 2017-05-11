@@ -1,2 +1,3 @@
 *-dump.sql
 /config/_*.conf
+/out/*
