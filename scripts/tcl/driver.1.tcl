@@ -3,15 +3,15 @@ if [catch {package require Thread} ] { error "Failed to load Thread library" }
 if [catch {package require Pgtcl} ] { error "Failed to load Pgtcl - Postgres Library Error" }
 
 #EDITABLE OPTIONS##################################################
-set total_iterations [lindex $argv 0] ;# Number of transactions before logging off
+set total_iterations $TOTAL_ITER ;# Number of transactions before logging off
 set RAISEERROR "false" ;# Exit script on PostgreSQL (true or false)
 set KEYANDTHINK "false" ;# Time for user thinking and keying (true or false)
 set ora_compatible "false" ;#Postgres Plus Oracle Compatible Schema
-set host [lindex $argv 1] ;# Address of the server hosting PostgreSQL
-set port [lindex $argv 2] ;# Port of the PostgreSQL Server
-set user [lindex $argv 3];# PostgreSQL user
-set password [lindex $argv 4] ;# Password for the PostgreSQL user
-set db [lindex $argv 5] ;# Database containing the TPC Schema
+set host "$HOST" ;# Address of the server hosting PostgreSQL
+set port "$PORT" ;# Port of the PostgreSQL Server
+set user "$DB_USER";# PostgreSQL user
+set password "$DB_USER_PASS" ;# Password for the PostgreSQL user
+set db "$DB_NAME" ;# Database containing the TPC Schema
 #EDITABLE OPTIONS##################################################
 
 #RANDOM NUMBER

@@ -1,8 +1,22 @@
+function crt_driver_out() {
+        PATH_TCL="${BASE_DIR}/scripts/tcl"
+        FILE_DRIVER="${PATH_TCL}/driver.1.tcl"
+        FILE_DRIVER_OUT="${PATH_TCL}/driver.out.tcl"
+        TOTAL_ITER=${TOTAL_ITERATIONS}
+        USER=${DB_USER}
+        PASS=${DB_USER_PASS}
+        DB=${DB_NAME}
+
+        envsubst < "${FILE_DRIVER}" > "${FILE_DRIVER_OUT}"
+}
+
+crt_driver_out
+
 SEQ1="4 6 8 10"
 SEQ2="12 14 16 18"
 SEQ3="20 22 24 26"
 CONFIGFILE=${PATH_AUTO_CONFIG}
-SCRIPT_FILE="${BASE_DIR}/scripts/tcl/driver.tcl" # No idea what is this!
+SCRIPT_FILE=${FILE_DRIVER} # No idea what is this!
 RUNS=6
 
 for x in $(eval echo "{1..$RUNS}")
@@ -17,7 +31,7 @@ do
 
                 #(cd /usr/local/hammerDB/ && ./hammerdb.tcl auto TPCC.postgres.tcl)
                 set -x
-                ${PATH_HAMMERDB}/hammerdb.tcl auto "${SCRIPT_FILE}"
+                ${PATH_HAMMERDB}/hammerdb.tcl auto "${FILE_DRIVER_OUT}"
                 set +x
                         
                 #echo "Reloading data"
