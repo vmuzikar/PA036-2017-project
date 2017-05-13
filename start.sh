@@ -88,6 +88,13 @@ fi
 
 mkdir -p ${PATH_OUT}
 
+ROLES_ARRAY=()
+while IFS='' read -r var || [[ -n "$var" ]]; do
+    ROLES_ARRAY+=("$var")
+done < "$PATH_VALUES"
+
+export ROLES_ARRAY
+
 if [ $LOAD_DB -eq 1 ] ; then
     log_info "Loading database from dump ${DB_DUMP_FILE}"
     load_database
