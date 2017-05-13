@@ -1,3 +1,5 @@
+--\o /dev/null
+
 SET ROLE tpcc;
 
 -- function will get random role
@@ -33,5 +35,10 @@ BEGIN
   	END LOOP;
 END;
 $$ LANGUAGE 'plpgsql';
+
+GRANT EXECUTE ON FUNCTION get_random_role() TO PUBLIC;
+GRANT EXECUTE ON FUNCTION do_action_query(role_name TEXT, act_query TEXT) TO PUBLIC;
+GRANT EXECUTE ON FUNCTION perf_test(max_iter integer, act_query TEXT) TO PUBLIC;
+
 
 SET ROLE tpcc;
