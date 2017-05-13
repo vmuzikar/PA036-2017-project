@@ -86,6 +86,8 @@ fi
 
 # RUN INIT VIEW
 
+mkdir -p ${PATH_OUT}
+
 if [ $LOAD_DB -eq 1 ] ; then
     log_info "Loading database from dump ${DB_DUMP_FILE}"
     load_database
