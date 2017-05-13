@@ -117,3 +117,15 @@ function db_user_grant_table()
     exec_query "GRANT ${perm} ON ${table} TO ${user}"
 }
 
+# Revokes grant from user to table with permissions
+# @param $1 - who
+# @param $2 - to which
+# @param $3 - permissions
+function db_user_revoke_grant_table()
+{
+    table=$1
+    user=$2
+    perm=${3:-"ALL"}
+    log_info "Revoking grant [${perm}] from ${user} on ${table}"
+    exec_query "REVOKE ${perm} ON ${table} FROM ${user}"
+}
