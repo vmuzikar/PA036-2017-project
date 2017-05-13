@@ -3,6 +3,8 @@ input="${PATH_VALUES}"
 first=""
 second=""
 
+exec_query "ALTER USER tpcc WITH SUPERUSER;"
+
 while IFS='' read -r var || [[ -n "$var" ]]; do
     
     if [ -z "${var// }" ]; then
@@ -17,4 +19,6 @@ while IFS='' read -r var || [[ -n "$var" ]]; do
 done < "$input"
 
 db_user_grant_user $first $second
+
+
 
