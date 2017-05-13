@@ -1,5 +1,5 @@
 
-NAME_OUT="${SCENARIO_NAME}-simple"
+NAME_OUT="simple-${SCENARIO_NAME}"
 OUT="${PATH_OUT}/${NAME_OUT}.log"
 
 echo "# RESULTS FOR SIMPLE TESTS!" > "$OUT"
