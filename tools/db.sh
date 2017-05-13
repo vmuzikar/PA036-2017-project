@@ -16,7 +16,7 @@ function exec_query()
 function exec_file() {
     file=${1}
     user=${2:-${SUPER_USER_NAME}}
-    psql ${HOST_PORT} -U "${user}" -d "${DB_NAME}" -f "${file}"
+    psql ${HOST_PORT} -U "${user}" -d "${DB_NAME}" -f "${file}" -v customers_table="$TABLE_CUSTOMERS" -v orders_table="$TABLE_ORDERS"
 }
 
 # Function dumps database
