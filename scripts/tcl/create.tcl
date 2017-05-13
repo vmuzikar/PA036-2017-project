@@ -1040,7 +1040,6 @@ proc Customer { lda d_id w_id CUST_PER_DIST ora_compatible } {
 	set c_credit_lim 50000
 	set h_amount 10.0
 	set my_values [listFromFile "config/values.txt"]
-	puts "MY_VALUES: $my_values"
 	if { $ora_compatible eq "true" } {
 		proc date_function {} {
 			set df "to_date('[ gettimestamp ]','YYYYMMDDHH24MISS')"

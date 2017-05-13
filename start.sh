@@ -2,15 +2,14 @@
 
 export FILE_BASE=`realpath $0`
 export BASE_DIR=`dirname ${FILE_BASE}`
-export CONFIG_NAME=${1:-"default"}
+export CONFIG_NAME="default"
 
 LOAD_DB=0
 DUMP_DB=1
-TEST_RUN=1
 SCENARIO_NAME="policy"
 DOCKER_START=1
 DOCKER_KILL=0
-
+RUN_TEST_SCENARIO="simple"
 function show_help()
 {
       echo "Usage: ./start.sh [OPTIONS]"
@@ -19,14 +18,14 @@ function show_help()
       echo -e "\t -l Load dump instead of generate (default: generate)"
       echo -e "\t -s (NAME) Run scenario(default: ${SCENARIO_NAME})"
       echo -e "\t -d Do not start docker container (default: no)"
-      echo -e "\t -t Do not run tests (default: no)"
+      echo -e "\t -T Run specific test (default: ${RUN_TEST_SCENARIO})"
       echo -e "\t -k Kill docker after run (default: no)"
       echo -e "\t -h show help"
 }
 
 
 
-while getopts ":c:ldkths:" opt; do
+while getopts ":T:c:ldkths:" opt; do
   case $opt in
     c)
       export CONFIG_NAME=${OPTARG}
@@ -40,28 +39,41 @@ while getopts ":c:ldkths:" opt; do
     s)
         SCENARIO_NAME=${OPTARG}
     ;;
-    t)
-        TEST_RUN=0
+    T)
+        RUN_TEST_SCENARIO=${OPTARG}
     ;;
     k)
         DOCKER_KILL=1
     ;;
     h)
         show_help
+        exit 0
     ;;
     \?)
       echo "Invalid option: -$OPTARG" >&2
       show_help
+      exit 1
       ;;
       *)
       show_help
+      exit 1
       ;;
   esac
 done
 
+META_CONFIG="${BASE_DIR}/config/_${CONFIG_NAME}.conf"
+
+echo "[INFO] Loading config \"${CONFIG_NAME}\""
 source "${BASE_DIR}/config/${CONFIG_NAME}.conf"
+
+if [ -e "${META_CONFIG}" ]; then
+    echo "[INFO] Loading meta config \"_${CONFIG_NAME}\""
+
+    source "${META_CONFIG}"
+fi
+
 source "${BASE_DIR}/tools/tools.sh"
-source "${BASE_DIR}/tools/docker.sh"
+load_dir_scripts "${BASE_DIR}/tools"
 
 
 function run_scenario() {    
@@ -75,11 +87,11 @@ fi
 # RUN INIT VIEW
 
 if [ $LOAD_DB -eq 1 ] ; then
-    echo "[INFO] Loading database from dump ${DB_DUMP_FILE}"
+    log_info "Loading database from dump ${DB_DUMP_FILE}"
     load_database
 
 else # Run init scripts
-    echo "[INFO] Loading database using init"
+    log_info "Loading database using init"
     load_init_scripts
 fi
 
@@ -87,9 +99,8 @@ if [ "$SCENARIO_NAME" != "" ]; then
     run_scenario "${SCENARIO_NAME}"
 fi
 
-if [ $TEST_RUN -eq 1 ]; then
-    load_tests_scripts
-fi
+load_tests_scripts "$RUN_TEST_SCENARIO"
+
 
 if [ $DOCKER_KILL -eq 1 ] ; then
     container_stop "$CONTAINER_NAME"

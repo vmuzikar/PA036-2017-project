@@ -1,9 +1,14 @@
+source "${BASE_DIR}/tools/00_logging.sh"
 
+# Wrapper over shell script load
 function load_script() {
-    echo "[INFO] Loading script: ${1}"
+    log_info "Loading script: ${1}"
     source "${1}"
 }
 
+# Function to load all scripts in given directory
+# Example: load_dir_scripts "${BASE_DIR}/init"
+# Example will execute all scripts that are in directory init
 function load_dir_scripts() {
     DIR_PATH=$1
     for f in `ls "${DIR_PATH}"/*.sh | sort`; do
@@ -11,10 +16,13 @@ function load_dir_scripts() {
     done
 }
 
+# Wrapper to load init scripts
 function load_init_scripts() {
     load_dir_scripts "${BASE_DIR}/init"
 }
 
+# Wrapper to load test scripts
+# if given an argument it will load files from subdir in tests
 function load_tests_scripts() {
     path="${BASE_DIR}/tests/"
 
@@ -25,36 +33,11 @@ function load_tests_scripts() {
     load_dir_scripts "${path}"
 }
 
+# Load all scripts from scenarios directory
 function load_senarios_script() {
     load_dir_scripts "${BASE_DIR}/scenarios/${1}"
 }
 
-function load_sql_scripts() {
-    DIR_PATH=$1
-    for f in `ls "${DIR_PATH}"/*.sql | sort`; do
-        echo -e "\t[INFO] Loading file: ${f}"
-        exec_file "${f}"
-    done
-}
-
-function exec_query()
-{
-    query=${1}
-    psql -h "${HOST}" -U "${SUPER_USER_NAME}" -d "${DB_NAME}" -c "${query}"
-}
-
-function exec_file() {
-    file=${1}
-    psql -h "${HOST}" -U "${SUPER_USER_NAME}" -d "${DB_NAME}" -f "${file}"
-}
-
-function dump_database() {
-    pg_dump -h "${HOST}" -p "${PORT}" -U "${SUPER_USER_NAME}" "${DB_NAME}" > "${DB_DUMP_FILE}" 
-}
 
 
-function load_database() {
-    psql -h "${HOST}" -U "${SUPER_USER_NAME}" -c "CREATE USER ${DB_USER} PASSWORD '${DB_USER_PASS}'"
-    psql -h "${HOST}" -U "${SUPER_USER_NAME}" -f "${DB_DUMP_FILE}" "postgres"
-}
 
