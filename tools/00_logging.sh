@@ -1,8 +1,13 @@
+function get_perf_time() 
+{
+    date +"%T.%N"
+}
+
 function log_any()
 {
     level="$1"
     msg="$2"
-    >&2 echo "$(date) [${level}]: ${msg}"
+    >&2 echo "$(get_perf_time) [${level}]: ${msg}"
 }
 
 function log_info()

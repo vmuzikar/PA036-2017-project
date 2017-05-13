@@ -34,12 +34,19 @@ function container_start {
 
 # Function will wait for container to be avaible
 # until then it will sleep
-function container_wait_for_avail {
+function container_wait_for_avail 
+{
     until nc -z $(sudo docker inspect --format='{{.NetworkSettings.IPAddress}}' $CONTAINER_NAME) 5432
     do
         log_info "waiting for $CONTAINER_NAME container..."
         sleep 1.5
     done
+}
+
+# Cleans up the unused volumes
+function docker_clean_up_volumes() 
+{
+    sudo docker volume ls -qf dangling=true | sudo xargs -r docker volume rm 
 }
 
 # Container will initialize container 

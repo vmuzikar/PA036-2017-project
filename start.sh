@@ -6,7 +6,6 @@ export CONFIG_NAME="default"
 
 LOAD_DB=0
 DUMP_DB=1
-TEST_RUN=1
 SCENARIO_NAME="policy"
 DOCKER_START=1
 DOCKER_KILL=0
@@ -19,7 +18,6 @@ function show_help()
       echo -e "\t -l Load dump instead of generate (default: generate)"
       echo -e "\t -s (NAME) Run scenario(default: ${SCENARIO_NAME})"
       echo -e "\t -d Do not start docker container (default: no)"
-      echo -e "\t -t Do not run tests (default: no)"
       echo -e "\t -T Run specific test (default: ${RUN_TEST_SCENARIO})"
       echo -e "\t -k Kill docker after run (default: no)"
       echo -e "\t -h show help"
@@ -40,9 +38,6 @@ while getopts ":T:c:ldkths:" opt; do
       ;;
     s)
         SCENARIO_NAME=${OPTARG}
-    ;;
-    t)
-        TEST_RUN=0
     ;;
     T)
         RUN_TEST_SCENARIO=${OPTARG}
@@ -104,9 +99,8 @@ if [ "$SCENARIO_NAME" != "" ]; then
     run_scenario "${SCENARIO_NAME}"
 fi
 
-if [ $TEST_RUN -eq 1 ]; then
-    load_tests_scripts "$RUN_TEST_SCENARIO"
-fi
+load_tests_scripts "$RUN_TEST_SCENARIO"
+
 
 if [ $DOCKER_KILL -eq 1 ] ; then
     container_stop "$CONTAINER_NAME"
