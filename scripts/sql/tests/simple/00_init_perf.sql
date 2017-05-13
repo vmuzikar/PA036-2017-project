@@ -1,4 +1,4 @@
---\o /dev/null
+\o /dev/null
 
 
 -- varibale for customers: :customers_table
@@ -21,24 +21,9 @@ $$ LANGUAGE plpgsql;
 CREATE OR REPLACE FUNCTION do_select_query(table_name TEXT, role_name TEXT) RETURNS void AS $$
 BEGIN
     EXECUTE 'SET ROLE ' || QUOTE_IDENT(role_name);
-    EXECUTE 'SELECT * FROM '|| QUOTE_IDENT(table_name) ||' ORDER BY RANDOM() LIMIT 1;'; -- TODO
+    EXECUTE 'SELECT * FROM '|| QUOTE_IDENT(table_name) ||' LIMIT 1;'; -- TODO
 END;
 $$ LANGUAGE plpgsql;
-
--- Function will perform performance tests
-CREATE OR REPLACE FUNCTION perf_select(table_name TEXT, max_iter integer) 
-RETURNS void AS
-$$ 
-DECLARE role_name TEXT;
-DECLARE counter integer = 0;
-BEGIN
-	WHILE counter != max_iter LOOP
-        role_name := get_random_role();
-    	PERFORM do_select_query(table_name, role_name);
-        counter := counter + 1;
-  	END LOOP;
-END;
-$$ LANGUAGE 'plpgsql';
 
 -- Function will create customer 
 -- @param role_name - Role NAME
@@ -56,7 +41,7 @@ $$ LANGUAGE plpgsql;
 
 -- Function will delete customer which id equal to counter
 -- @param max_iter - Iter name
-CREATE OR REPLACE FUNCTION do_delete_customer(table_name TEXT,counter integer) RETURNS void AS $$
+CREATE OR REPLACE FUNCTION do_delete_customer(table_name TEXT, counter integer) RETURNS void AS $$
 DECLARE
     statement TEXT;
 BEGIN
@@ -75,6 +60,21 @@ BEGIN
    EXECUTE statement USING 'CUP_' || CAST( counter as TEXT), counter;
 END;
 $$ LANGUAGE plpgsql;
+
+-- Function will perform tests of select
+CREATE OR REPLACE FUNCTION perf_select(table_name TEXT, max_iter integer) 
+RETURNS void AS
+$$ 
+DECLARE role_name TEXT;
+DECLARE counter integer = 0;
+BEGIN
+	WHILE counter != max_iter LOOP
+        role_name := get_random_role();
+    	PERFORM do_select_query(table_name, role_name);
+        counter := counter + 1;
+  	END LOOP;
+END;
+$$ LANGUAGE 'plpgsql';
 
 -- Function will create customers
 -- @param max_iter integer
