@@ -80,7 +80,7 @@ function load_sql_pretty_scripts() {
         echo -e "#################################################" >> ${OUT}
         echo -e "--- RESULTS: `basename ${f}` ---" >> $OUT
         exec_file "${f}" >> $OUT
-        echo -e "\n\n"
+        echo -e "\n" >> ${OUT} 
     done
 }
 
@@ -116,3 +116,4 @@ function db_user_grant_table()
     log_info "Granting [${perm}] for ${user} on ${table}"
     exec_query "GRANT ${perm} ON ${table} TO ${user}"
 }
+

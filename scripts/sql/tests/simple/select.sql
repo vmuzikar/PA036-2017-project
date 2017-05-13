@@ -1,6 +1,5 @@
-SET ROLE manager \o /dev/null;
-\timing on \o /dev/null;
+\o /dev/null;
 
+\timing on
 SELECT * FROM customer LIMIT 1;
-
-\timing off \o /dev/null;
+\timing off
