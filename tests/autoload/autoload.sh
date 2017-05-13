@@ -29,10 +29,14 @@ do
                 echo "Running tests for series: $s"
                 sed -i "s/<autopilot_sequence>.*<\/autopilot_sequence>/<autopilot_sequence>${s}<\/autopilot_sequence>/" $CONFIGFILE
 
+                OLD_PATH=`pwd`
                 #(cd /usr/local/hammerDB/ && ./hammerdb.tcl auto TPCC.postgres.tcl)
+                cd "${PATH_HAMMERDB}"
                 set -x
                 ${PATH_HAMMERDB}/hammerdb.tcl auto "${FILE_DRIVER_OUT}"
                 set +x
+                cd "${OLD_PATH}"
+
                         
                 #echo "Reloading data"
                 #ssh postgres@postgres  '/var/lib/pgsql/reloadData.sh'
