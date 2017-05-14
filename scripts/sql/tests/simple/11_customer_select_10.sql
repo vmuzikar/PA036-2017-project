@@ -2,9 +2,10 @@
 
 SET ROLE tpcc;
 \timing on
-SELECT perf_select_orders(:'orders_table', 1000);
+SELECT perf_select(:'customers_table', 10);
 \timing off
 
 
 SET ROLE tpcc;
+
 

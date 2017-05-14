@@ -1,4 +1,9 @@
-CREATE OR REPLACE FUNCTION access_control_update_delete() RETURNS trigger AS $terminator$
+-- Creating the view for accessing the data (instead of querying the table directly)
+CREATE OR REPLACE VIEW customer_view WITH (security_barrier) AS
+    SELECT * FROM customer WHERE pg_has_role(record_select, 'member');
+
+-- Trigger function for UPDATE and DELETE operations
+CREATE OR REPLACE FUNCTION customer_access_control_update_delete() RETURNS trigger AS $terminator$
     DECLARE
         user_role text := current_setting('role');
     BEGIN
@@ -59,3 +64,8 @@ CREATE OR REPLACE FUNCTION access_control_update_delete() RETURNS trigger AS $te
         END IF;
     END;
 $terminator$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- The trigger definition
+CREATE TRIGGER update_delete_trigger
+    INSTEAD OF UPDATE OR DELETE ON customer_view
+    FOR EACH ROW EXECUTE PROCEDURE customer_access_control_update_delete();

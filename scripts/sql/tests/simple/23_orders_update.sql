@@ -8,4 +8,4 @@ SELECT do_update_order(:'orders_table', 2002);
 \timing off
 
 -- test and deletion
-SELECT do_delete_order(:'orders_table', 2002);
+SELECT do_delete_order('orders', 2002);
