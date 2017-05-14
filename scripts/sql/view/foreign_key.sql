@@ -35,7 +35,7 @@ CREATE OR REPLACE FUNCTION orders_access_control_update_delete() RETURNS trigger
         
         IF (TG_OP = 'UPDATE') THEN
             IF customer_has_role(user_role, 'update', OLD.o_c_id, OLD.o_d_id, OLD.o_w_id) THEN
-                UPDATE order
+                UPDATE orders
                 SET
                     o_id = NEW.o_id,
                     o_w_id = NEW.o_w_id,
@@ -53,7 +53,7 @@ CREATE OR REPLACE FUNCTION orders_access_control_update_delete() RETURNS trigger
             END IF;
         ELSIF (TG_OP = 'DELETE') THEN
             IF customer_has_role(user_role, 'delete', OLD.o_c_id, OLD.o_d_id, OLD.o_w_id) THEN
-                DELETE FROM order WHERE o_w_id = OLD.o_w_id AND o_d_id = OLD.o_d_id AND o_id = OLD.o_id;
+                DELETE FROM orders WHERE o_w_id = OLD.o_w_id AND o_d_id = OLD.o_d_id AND o_id = OLD.o_id;
                 RETURN OLD;
             ELSE
                 RETURN NULL;
