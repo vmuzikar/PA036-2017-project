@@ -1,5 +1,13 @@
 HOST_PORT=" -h ${HOST} -p ${PORT} -U ${SUPER_USER_NAME}"
 HOST_PORT_SUPER="${HOST_PORT} "
+ROLES_ARRAY=()
+
+
+while IFS='' read -r var || [[ -n "$var" ]]; do
+    ROLES_ARRAY+=("$var")
+done < "$PATH_VALUES"
+
+export ROLES_ARRAY
 
 # Function executes query
 # @param $1 - query string
@@ -40,6 +48,19 @@ function dump_global() {
 function load_dump() {
     log_info "Loading database from dump \"$1\" to [${2}]"
     psql ${HOST_PORT_SUPER} -f "${1}" "${2}"
+}
+
+function clean_db_roles() {
+    for i in "${ROLES_ARRAY[@]}"; do 
+        exec_query "DROP ROLE IF EXISTS ${i};"
+    done
+}
+
+function clean_database() {
+    exec_query "drop schema public CASCADE;"
+    clean_db_roles();
+    exec_query "DROP DATABASE ${DB_NAME};"
+    exec_query "DROP USER  IF EXISTS ${DB_USER};"
 }
 
 
