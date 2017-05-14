@@ -9,6 +9,7 @@ DUMP_DB=1
 SCENARIO_NAME="policy"
 DOCKER_START=1
 DOCKER_KILL=0
+CLEAN_DATABASE=0
 RUN_TEST_SCENARIO="simple"
 function show_help()
 {
@@ -18,17 +19,20 @@ function show_help()
       echo -e "\t -l Load dump instead of generate (default: generate)"
       echo -e "\t -s (NAME) Run scenario(default: ${SCENARIO_NAME})"
       echo -e "\t -d Do not start docker container (default: no)"
+      echo -e "\t -C Clean database (default: no)"
       echo -e "\t -T Run specific test (default: ${RUN_TEST_SCENARIO})"
       echo -e "\t -k Kill docker after run (default: no)"
       echo -e "\t -h show help"
 }
 
-
-
-while getopts ":T:c:ldkths:" opt; do
+# Parse options
+while getopts ":T:c:ldkthsC:" opt; do
   case $opt in
     c)
       export CONFIG_NAME=${OPTARG}
+      ;;
+    C)
+      CLEAN_DATABASE=1
       ;;
     l)
       LOAD_DB=1
@@ -61,6 +65,7 @@ while getopts ":T:c:ldkths:" opt; do
   esac
 done
 
+# Second config file
 META_CONFIG="${BASE_DIR}/config/_${CONFIG_NAME}.conf"
 
 echo "[INFO] Loading config \"${CONFIG_NAME}\""
@@ -76,7 +81,8 @@ source "${BASE_DIR}/tools/tools.sh"
 load_dir_scripts "${BASE_DIR}/tools"
 
 
-function run_scenario() {    
+function run_scenario() {
+    log_info "Running: ${1}"    
     load_senarios_script $1
 }
 
@@ -88,12 +94,9 @@ fi
 
 mkdir -p ${PATH_OUT}
 
-ROLES_ARRAY=()
-while IFS='' read -r var || [[ -n "$var" ]]; do
-    ROLES_ARRAY+=("$var")
-done < "$PATH_VALUES"
-
-export ROLES_ARRAY
+if [ $CLEAN_DATABASE -eq 1 ]; then
+    clean_database
+fi
 
 if [ $LOAD_DB -eq 1 ] ; then
     log_info "Loading database from dump ${DB_DUMP_FILE}"
