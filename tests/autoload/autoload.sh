@@ -1,14 +1,21 @@
 PATH_TCL="${BASE_DIR}/scripts/tcl"
 FILE_DRIVER="${PATH_TCL}/driver.1.tcl"
 FILE_DRIVER_OUT="${PATH_TCL}/driver.out.tcl"
+FILE_TEMPLATE_XML="${BASE_DIR}/config/config_HammerDB_template.xml"
 
-function crt_driver_out() {
-
+function crt_driver_out() 
+{
         PARAMS='${TOTAL_ITERATIONS} ${HOST} ${PORT} ${DB_USER} ${DB_USER_PASS} ${DB_NAME}'     
         envsubst "$PARAMS" < "${FILE_DRIVER}" > "${FILE_DRIVER_OUT}"
 }
 
+function copy_template_xml() 
+{
+        cp "$FILE_TEMPLATE_XML" "${PATH_HAMMERDB}/config.xml"
+}
+
 crt_driver_out
+copy_template_xml
 
 SEQ1="2 3"
 #SEQ2="12 14 16 18"
