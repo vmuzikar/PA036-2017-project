@@ -19,3 +19,4 @@ CREATE POLICY delete_orders ON orders FOR DELETE USING ( (o_c_id,o_w_id,o_d_id) 
 		WHERE pg_has_role(current_user, cust.record_delete,'member') ) );
 
 CREATE POLICY insert_orders ON orders FOR INSERT WITH CHECK (true);
+
