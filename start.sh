@@ -26,7 +26,7 @@ function show_help()
 }
 
 # Parse options
-while getopts ":T:c:ldkthsC:" opt; do
+while getopts ":T:c:ldkths:C" opt; do
   case $opt in
     c)
       export CONFIG_NAME=${OPTARG}
