@@ -98,10 +98,11 @@ function load_sql_pretty_scripts() {
     NAME_OUT=$2
     OUT="${PATH_OUT}/${NAME_OUT}.log"
     for f in `ls "${DIR_PATH}"/*.sql | sort`; do
-        echo -e "#################################################" >> ${OUT}
-        echo -e "--- RESULTS: `basename ${f}` ---" >> $OUT
-        exec_file "${f}" | grep -v "Timing is">> $OUT
-        echo -e "\n" >> ${OUT} 
+        fname="`basename ${f}`";
+        fname="${fname%.*}"
+        fname="${fname:3}"
+        exec_result=$(exec_file "${f}" | grep -v "Timing is" | sed 's/Time://g')
+        echo "$fname: ${exec_result}" >> $OUT
     done
 }
 
