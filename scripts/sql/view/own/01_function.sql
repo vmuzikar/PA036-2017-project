@@ -49,7 +49,7 @@ CREATE OR REPLACE FUNCTION access_control_update_delete() RETURNS trigger AS $te
             END IF;
         ELSIF (TG_OP = 'DELETE') THEN
             IF pg_has_role(user_role, OLD.record_delete,'member') THEN
-                DELETE FROM customer WHERE c_id = OLD.c_id AND c_w_id = OLD.c_w_id;
+                DELETE FROM customer WHERE c_id = OLD.c_id AND c_d_id = OLD.c_d_id AND c_w_id = OLD.c_w_id;
                 RETURN OLD;
             ELSE
                 RETURN NULL;
