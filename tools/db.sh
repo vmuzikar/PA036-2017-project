@@ -58,7 +58,7 @@ function clean_db_roles() {
 
 function clean_database() {
     exec_query "drop schema public CASCADE;"
-    clean_db_roles();
+    clean_db_roles
     exec_query "DROP DATABASE ${DB_NAME};"
     exec_query "DROP USER  IF EXISTS ${DB_USER};"
 }
