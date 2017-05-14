@@ -100,7 +100,7 @@ function load_sql_pretty_scripts() {
     for f in `ls "${DIR_PATH}"/*.sql | sort`; do
         echo -e "#################################################" >> ${OUT}
         echo -e "--- RESULTS: `basename ${f}` ---" >> $OUT
-        exec_file "${f}" >> $OUT
+        exec_file "${f}" | grep -v "Timing is">> $OUT
         echo -e "\n" >> ${OUT} 
     done
 }
