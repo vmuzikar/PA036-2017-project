@@ -10,19 +10,18 @@ function crt_driver_out() {
 
 crt_driver_out
 
-SEQ1="4 6 8 10"
-SEQ2="12 14 16 18"
-SEQ3="20 22 24 26"
+SEQ1="2 3"
+#SEQ2="12 14 16 18"
+#SEQ3="20 22 24 26"
 CONFIGFILE=${PATH_AUTO_CONFIG}
-SCRIPT_FILE=${FILE_DRIVER} # No idea what is this!
-RUNS=6
+RUNS=1
 
 for x in $(eval echo "{1..$RUNS}")
 do
         # Running a number of passes for this autopilot sequence
         echo "running run $x of $RUNS"
 
-        for s in "$SEQ1" "$SEQ2" "$SEQ3"
+        for s in "$SEQ1" #"$SEQ2" "$SEQ3"
         do
                 echo "Running tests for series: $s"
                 sed -i "s/<autopilot_sequence>.*<\/autopilot_sequence>/<autopilot_sequence>${s}<\/autopilot_sequence>/" $CONFIGFILE
