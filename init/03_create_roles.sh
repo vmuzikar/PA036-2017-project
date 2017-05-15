@@ -3,6 +3,15 @@ input="${PATH_VALUES}"
 first=""
 second=""
 
+exec_query "ALTER USER tpcc WITH SUPERUSER;"
+
+ROLES_ARRAY=()
+while IFS='' read -r var || [[ -n "$var" ]]; do
+    ROLES_ARRAY+=("$var")
+done < "$input"
+
+# Roles array - do what ever you want
+
 while IFS='' read -r var || [[ -n "$var" ]]; do
     
     if [ -z "${var// }" ]; then
@@ -17,4 +26,6 @@ while IFS='' read -r var || [[ -n "$var" ]]; do
 done < "$input"
 
 db_user_grant_user $first $second
+
+
 

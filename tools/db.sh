@@ -1,5 +1,13 @@
 HOST_PORT=" -h ${HOST} -p ${PORT} -U ${SUPER_USER_NAME}"
 HOST_PORT_SUPER="${HOST_PORT} "
+ROLES_ARRAY=()
+
+
+while IFS='' read -r var || [[ -n "$var" ]]; do
+    ROLES_ARRAY+=("$var")
+done < "$PATH_VALUES"
+
+export ROLES_ARRAY
 
 # Function executes query
 # @param $1 - query string
@@ -16,7 +24,7 @@ function exec_query()
 function exec_file() {
     file=${1}
     user=${2:-${SUPER_USER_NAME}}
-    psql ${HOST_PORT} -U "${user}" -d "${DB_NAME}" -f "${file}"
+    psql ${HOST_PORT} -U "${user}" -d "${DB_NAME}" -f "${file}" -v customers_table="$TABLE_CUSTOMERS" -v orders_table="$TABLE_ORDERS"
 }
 
 # Function dumps database
@@ -40,6 +48,19 @@ function dump_global() {
 function load_dump() {
     log_info "Loading database from dump \"$1\" to [${2}]"
     psql ${HOST_PORT_SUPER} -f "${1}" "${2}"
+}
+
+function clean_db_roles() {
+    for i in "${ROLES_ARRAY[@]}"; do 
+        exec_query "DROP ROLE IF EXISTS ${i};"
+    done
+}
+
+function clean_database() {
+    exec_query "drop schema public CASCADE;"
+    clean_db_roles
+    exec_query "DROP DATABASE ${DB_NAME};"
+    exec_query "DROP USER  IF EXISTS ${DB_USER};"
 }
 
 
@@ -77,10 +98,11 @@ function load_sql_pretty_scripts() {
     NAME_OUT=$2
     OUT="${PATH_OUT}/${NAME_OUT}.log"
     for f in `ls "${DIR_PATH}"/*.sql | sort`; do
-        echo -e "#################################################" >> ${OUT}
-        echo -e "--- RESULTS: `basename ${f}` ---" >> $OUT
-        exec_file "${f}" >> $OUT
-        echo -e "\n\n"
+        fname="`basename ${f}`";
+        fname="${fname%.*}"
+        fname="${fname:3}"
+        exec_result=$(exec_file "${f}" | grep -v "Timing is" | sed 's/Time://g')
+        echo "$fname: ${exec_result}" >> $OUT
     done
 }
 
@@ -115,4 +137,17 @@ function db_user_grant_table()
     perm=${3:-"ALL"}
     log_info "Granting [${perm}] for ${user} on ${table}"
     exec_query "GRANT ${perm} ON ${table} TO ${user}"
+}
+
+# Revokes grant from user to table with permissions
+# @param $1 - who
+# @param $2 - to which
+# @param $3 - permissions
+function db_user_revoke_grant_table()
+{
+    table=$1
+    user=$2
+    perm=${3:-"ALL"}
+    log_info "Revoking grant [${perm}] from ${user} on ${table}"
+    exec_query "REVOKE ${perm} ON ${table} FROM ${user}"
 }
